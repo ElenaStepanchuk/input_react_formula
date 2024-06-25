@@ -1,13 +1,13 @@
 import React, { useState } from "react";
 import Autosuggest from "react-autosuggest";
 import listFormulas from "./listFormulas.json";
-import highlight from "autosuggest-highlight/match";
 import "./formulaInput.css";
 
 const FormulaInput = () => {
   const allFunctions = listFormulas.functions;
-  const [value, setValue] = useState("");
+  const [currentInput, setCurrentInput] = useState("");
   const [suggestions, setSuggestions] = useState([]);
+  const [selectedFunctions, setSelectedFunctions] = useState([]);
 
   const getSuggestions = (inputValue) => {
     const inputValueLower = inputValue.trim().toLowerCase();
@@ -27,7 +27,14 @@ const FormulaInput = () => {
   };
 
   const onChange = (event, { newValue }) => {
-    setValue(newValue);
+    setCurrentInput(newValue);
+  };
+
+  const onSuggestionSelected = (event, { suggestion }) => {
+    const updatedFunctions = [...selectedFunctions, suggestion];
+    setSelectedFunctions(updatedFunctions);
+
+    setCurrentInput("");
   };
 
   const onSuggestionsFetchRequested = ({ value }) => {
@@ -39,22 +46,32 @@ const FormulaInput = () => {
   };
 
   const inputProps = {
-    placeholder: "Enter an Excel function",
-    value,
+    placeholder: "Enter a function",
+    value: currentInput,
     onChange: onChange,
   };
 
   return (
-    <div>
-      <h1>Excel Function Autocomplete</h1>
-      <Autosuggest
-        suggestions={suggestions}
-        onSuggestionsFetchRequested={onSuggestionsFetchRequested}
-        onSuggestionsClearRequested={onSuggestionsClearRequested}
-        getSuggestionValue={getSuggestionValue}
-        renderSuggestion={renderSuggestion}
-        inputProps={inputProps}
-      />
+    <div className="container">
+      <h1>Formulas Autocomplete</h1>
+      <div>
+        <div className="container_list">
+          <div>
+            {selectedFunctions.join("")}
+            {selectedFunctions.length > 0 && currentInput && ""}
+            {currentInput}
+          </div>
+          <Autosuggest
+            suggestions={suggestions}
+            onSuggestionsFetchRequested={onSuggestionsFetchRequested}
+            onSuggestionsClearRequested={onSuggestionsClearRequested}
+            getSuggestionValue={getSuggestionValue}
+            renderSuggestion={renderSuggestion}
+            onSuggestionSelected={onSuggestionSelected}
+            inputProps={inputProps}
+          />
+        </div>
+      </div>
     </div>
   );
 };
