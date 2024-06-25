@@ -46,14 +46,27 @@
   list-style-type: none;
   background-color: #0b010809;
 }
-
+.react-autosuggest__suggestion:not(:last-child) {
+  margin-bottom: 10px;
+}
 .react-autosuggest__suggestion--highlighted {
   background-color: #675c5c;
   list-style-type: none;
 }
-.selectedFunctions {
-  display: inline-block;
+
+.react-autosuggest__suggestions-list {
+  padding: 0;
+}
+
+.container_formula {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.formula_item {
+  border: 1px solid #ccc;
   padding: 5px;
-  border: 1px solid rgb(56, 56, 56);
-  border-radius: 5px;
+  border-radius: 4px;
+  background-color: #f9f9f9;
 }

@@ -33,7 +33,6 @@ const FormulaInput = () => {
   const onSuggestionSelected = (event, { suggestion }) => {
     const updatedFunctions = [...selectedFunctions, suggestion];
     setSelectedFunctions(updatedFunctions);
-
     setCurrentInput("");
   };
 
@@ -56,20 +55,23 @@ const FormulaInput = () => {
       <h1>Formulas Autocomplete</h1>
       <div>
         <div className="container_list">
-          <div>
-            {selectedFunctions.join("")}
-            {selectedFunctions.length > 0 && currentInput && ""}
-            {currentInput}
+          <div className="container_formula">
+            {selectedFunctions.map((func, index) => (
+              <div key={index} className="formula_item">
+                {func}
+                <button> X </button>
+              </div>
+            ))}
+            <Autosuggest
+              suggestions={suggestions}
+              onSuggestionsFetchRequested={onSuggestionsFetchRequested}
+              onSuggestionsClearRequested={onSuggestionsClearRequested}
+              getSuggestionValue={getSuggestionValue}
+              renderSuggestion={renderSuggestion}
+              onSuggestionSelected={onSuggestionSelected}
+              inputProps={inputProps}
+            />
           </div>
-          <Autosuggest
-            suggestions={suggestions}
-            onSuggestionsFetchRequested={onSuggestionsFetchRequested}
-            onSuggestionsClearRequested={onSuggestionsClearRequested}
-            getSuggestionValue={getSuggestionValue}
-            renderSuggestion={renderSuggestion}
-            onSuggestionSelected={onSuggestionSelected}
-            inputProps={inputProps}
-          />
         </div>
       </div>
     </div>
