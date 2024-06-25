@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import Autosuggest from "react-autosuggest";
-import highlight from "autosuggest-highlight/match";
 import listFormulas from "./listFormulas.json";
+import highlight from "autosuggest-highlight/match";
 import "./formulaInput.css";
 
 const FormulaInput = () => {
@@ -22,18 +22,8 @@ const FormulaInput = () => {
 
   const getSuggestionValue = (suggestion) => suggestion;
 
-  const renderSuggestion = (suggestion, { query }) => {
-    const matches = highlight(suggestion, query);
-    const parts = matches.map((part, index) => {
-      const className = part.highlight ? "highlight" : null;
-      return (
-        <span className={className} key={index}>
-          {part.text}
-        </span>
-      );
-    });
-
-    return <span>{parts}</span>;
+  const renderSuggestion = (suggestion) => {
+    return <span>{suggestion}</span>;
   };
 
   const onChange = (event, { newValue }) => {
@@ -58,7 +48,6 @@ const FormulaInput = () => {
     <div>
       <h1>Excel Function Autocomplete</h1>
       <Autosuggest
-        styles={{ color: "red" }}
         suggestions={suggestions}
         onSuggestionsFetchRequested={onSuggestionsFetchRequested}
         onSuggestionsClearRequested={onSuggestionsClearRequested}
