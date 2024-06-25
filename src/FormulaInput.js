@@ -1,68 +1,71 @@
 import React, { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
-import * as math from "mathjs";
-import useStore from "./store";
-
-const fetchSuggestions = async (query) => {
-  try {
-    const parsed = math.parse(query);
-
-    console.log(parsed);
-
-    const suggestions = parsed
-      .filter((node) => node.isSymbolNode)
-      .map((node) => node.name);
-    return suggestions;
-  } catch (error) {
-    console.error("Error parsing the query:", error);
-    return [];
-  }
-};
+import Autosuggest from "react-autosuggest";
+import highlight from "autosuggest-highlight/match";
+import listFormulas from "./listFormulas.json";
+import "./formulaInput.css";
 
 const FormulaInput = () => {
-  const { formula, setFormula } = useStore();
-  const [inputValue, setInputValue] = useState("");
+  const allFunctions = listFormulas.functions;
+  const [value, setValue] = useState("");
+  const [suggestions, setSuggestions] = useState([]);
 
-  const { data: suggestions } = useQuery({
-    queryKey: ["suggestions", inputValue],
-    queryFn: () => fetchSuggestions(inputValue),
-    enabled: !!inputValue,
-  });
+  const getSuggestions = (inputValue) => {
+    const inputValueLower = inputValue.trim().toLowerCase();
+    const inputLength = inputValueLower.length;
 
-  const handleChange = (e) => {
-    const value = e.target.value;
-    setInputValue(value);
-    setFormula(value);
+    return inputLength === 0
+      ? []
+      : allFunctions.filter(
+          (func) => func.toLowerCase().slice(0, inputLength) === inputValueLower
+        );
   };
 
-  const handleSelectSuggestion = (suggestion) => {
-    const newFormula = formula + suggestion;
-    setFormula(newFormula);
-    setInputValue("");
+  const getSuggestionValue = (suggestion) => suggestion;
+
+  const renderSuggestion = (suggestion, { query }) => {
+    const matches = highlight(suggestion, query);
+    const parts = matches.map((part, index) => {
+      const className = part.highlight ? "highlight" : null;
+      return (
+        <span className={className} key={index}>
+          {part.text}
+        </span>
+      );
+    });
+
+    return <span>{parts}</span>;
+  };
+
+  const onChange = (event, { newValue }) => {
+    setValue(newValue);
+  };
+
+  const onSuggestionsFetchRequested = ({ value }) => {
+    setSuggestions(getSuggestions(value));
+  };
+
+  const onSuggestionsClearRequested = () => {
+    setSuggestions([]);
+  };
+
+  const inputProps = {
+    placeholder: "Enter an Excel function",
+    value,
+    onChange: onChange,
   };
 
   return (
     <div>
-      <input
-        type="text"
-        value={inputValue}
-        onChange={handleChange}
-        placeholder="Enter formula..."
-        autocomplete="on"
+      <h1>Excel Function Autocomplete</h1>
+      <Autosuggest
+        styles={{ color: "red" }}
+        suggestions={suggestions}
+        onSuggestionsFetchRequested={onSuggestionsFetchRequested}
+        onSuggestionsClearRequested={onSuggestionsClearRequested}
+        getSuggestionValue={getSuggestionValue}
+        renderSuggestion={renderSuggestion}
+        inputProps={inputProps}
       />
-      {suggestions && (
-        <ul>
-          {suggestions.map((suggestion) => (
-            <li
-              key={suggestion}
-              onClick={() => handleSelectSuggestion(suggestion)}
-            >
-              {suggestion}
-            </li>
-          ))}
-        </ul>
-      )}
-      <div>Formula: {formula}</div>
     </div>
   );
 };
